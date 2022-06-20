@@ -1,0 +1,43 @@
+version: '3.8'
+
+networks:
+  app-tier:
+    driver: bridge
+
+services:
+  postgres-master:
+    image: 'bitnami/postgresql:latest'
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: test_db
+      POSTGRESQL_REPLICATION_MODE: master
+      POSTGRESQL_REPLICATION_USER: master
+      POSTGRESQL_REPLICATION_PASSWORD: master
+    ports:
+      - '5432'
+    networks:
+      - app-tier
+    volumes:
+      - 'postgresql_master_data:/bitnami/postgresql'
+
+  postgresql-slave:
+    image: 'bitnami/postgresql:latest'
+    ports:
+      - "5440:5432"
+    networks:
+      - app-tier
+    depends_on:
+      - postgres-master
+    environment:
+      - POSTGRESQL_REPLICATION_MODE=slave
+      - POSTGRESQL_REPLICATION_USER=postgres
+      - POSTGRESQL_REPLICATION_PASSWORD=postgres
+      - POSTGRESQL_MASTER_PORT_NUMBER=5432
+      - POSTGRESQL_MASTER_HOST=postgres-master
+      - POSTGRESQL_PASSWORD=postgres
+  
+volumes:
+  postgresql_master_data:
+    driver: local

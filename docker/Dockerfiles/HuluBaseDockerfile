@@ -1,0 +1,4 @@
+ARG upstream_tag
+FROM mcr.microsoft.com/dotnet/${upstream_tag}
+
+# docker build -f HuluBaseDockerfile -t hulu.azurecr.io/base/aspnet:6.0 --build-arg upstream_tag=aspnet:6.0 .
